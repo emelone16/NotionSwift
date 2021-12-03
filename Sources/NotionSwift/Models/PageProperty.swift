@@ -25,7 +25,7 @@ public struct WritePageProperty {
 
 public enum PagePropertyType {
     case richText([RichText])
-    case number(Int?)
+    case number(Double?)
     case select(SelectPropertyValue?)
     case multiSelect([MultiSelectPropertyValue])
     case date(DateRange?)
@@ -170,7 +170,7 @@ extension PagePropertyType: Codable {
             self = .richText(value)
         case CodingKeys.number.stringValue:
             let value = try container.decodeIfPresent(
-                Int.self,
+                Double.self,
                 forKey: .number
             )
             self = .number(value)
@@ -235,11 +235,16 @@ extension PagePropertyType: Codable {
             )
             self = .checkbox(value)
         case CodingKeys.url.stringValue:
-            let value = try container.decode(
+            let value = try container.decodeIfPresent(
                 String.self,
                 forKey: .url
             )
-            self = .url(URL(string: value))
+            
+            if let url = value {
+                self = .url(URL(string: url))
+            } else {
+                self = .url(nil)
+            }
         case CodingKeys.email.stringValue:
             let value = try container.decodeIfPresent(
                 String.self,
